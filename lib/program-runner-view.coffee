@@ -25,5 +25,4 @@ class ProgramRunnerView
 
   setContent: (content) ->
     output = document.getElementsByClassName('output')?[0]
-    console.log output
     output.textContent = content if output?

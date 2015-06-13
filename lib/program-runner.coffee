@@ -1,5 +1,9 @@
+# Package Entry Module
+
 ProgramRunnerView = require './program-runner-view'
 {CompositeDisposable} = require 'atom'
+
+# Logic Module
 runner = require './runner'
 
 module.exports = ProgramRunner =
@@ -14,7 +18,7 @@ module.exports = ProgramRunner =
     # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     @subscriptions = new CompositeDisposable
 
-    # Register command that toggles this view
+    # Register commands and get ready for later disposal
     @subscriptions.add atom.commands.add 'atom-workspace', 'program-runner:run': => @run()
     @subscriptions.add atom.commands.add 'atom-workspace', 'program-runner:toggle': => @toggle()
 
@@ -26,17 +30,20 @@ module.exports = ProgramRunner =
   serialize: ->
     programRunnerViewState: @programRunnerView.serialize()
 
-  run: ->
-    @modalPanel.show() if not @modalPanel.isVisible()
+  #### Customized methods from below ####
 
-    runner.runProgram (err, result) =>
-      return console.err err if err?
-      console.log(result)
-
-      @programRunnerView.setContent result
-
+  # Toggle the panel
   toggle: ->
     if @modalPanel.isVisible()
       @modalPanel.hide()
     else
       @modalPanel.show()
+
+  # Run the code being edited
+  # Compile it first if needed
+  run: ->
+    runner.runProgram (err, result) =>
+      return console.err err if err?
+
+      @programRunnerView.setContent result
+      @modalPanel.show() if not @modalPanel.isVisible()
